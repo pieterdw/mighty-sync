@@ -2,8 +2,25 @@
   "name": "mighty-sync",
   "version": "0.0.1",
   "description": "Another sync tool",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "repository": "https://gitlab.com/straffekoffie/mighty-sync.git",
   "author": "Pieter De Witte <pieter@straffekoffie.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "build": "parcel build index.ts",
+    "launch": "node ./dist/index.js"
+  },
+  "engines": {
+    "node": ">=4.x"
+  },
+  "targets": {
+    "main": {
+      "node": [
+        "^4.0.0"
+      ]
+    }
+  },
+  "devDependencies": {
+    "parcel": "^2.0.0-alpha.1.1"
+  }
 }
