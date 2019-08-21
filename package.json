@@ -11,28 +11,37 @@
   "author": "Pieter De Witte <pieter@straffekoffie.com>",
   "license": "MIT",
   "scripts": {
+    "start": "yarn build && yarn launch",
     "build": "parcel build index.ts",
     "launch": "node ./dist/index.js"
   },
   "engines": {
-    "node": ">=4.x"
+    "node": ">=8.x"
   },
   "targets": {
     "main": {
       "node": [
-        "^4.0.0"
+        "^8.0.0"
       ]
     }
   },
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "chalk": "^2.4.2",
     "chokidar": "^3.0.2",
+    "core-js": "2",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
     "minimist": "^1.2.0",
     "update-notifier": "^3.0.1"
   },
   "devDependencies": {
-    "parcel": "^2.0.0-alpha.1.1"
+    "@types/fs-extra": "^8.0.0",
+    "@types/lodash": "^4.14.137",
+    "@types/minimist": "^1.2.0",
+    "@types/node": "^12.7.2",
+    "@types/update-notifier": "^2.5.0",
+    "parcel": "^1.12.3",
+    "typescript": "^3.5.3"
   }
 }
