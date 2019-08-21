@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import "babel-polyfill";
 import chalk from "chalk";
 import minimist from "minimist";
@@ -5,7 +7,7 @@ import path from "path";
 import updateNotifier from "update-notifier";
 import sync from "./sync";
 
-const pkg = require("./package.json");
+const pkg = require("../package.json");
 
 var opts: minimist.Opts = {
   boolean: ["help", "delete", "watch", "version", "verbose", "notify-update"],
@@ -63,11 +65,11 @@ var notifyPriority = {
 };
 
 function help() {
-  console.log("%s - v. %s", chalk.bold(pkg.name), chalk.cyan(pkg.version));
+  console.log("%s %s", chalk.bold(pkg.name), chalk.cyan(pkg.version));
   console.log(pkg.description);
   console.log("");
   console.log(
-    "Usage: " +
+    "Usage:\t" +
       chalk.bold(pkg.name) +
       " [" +
       chalk.blue("options") +
