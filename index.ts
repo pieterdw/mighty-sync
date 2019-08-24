@@ -2,21 +2,28 @@
 
 import "babel-polyfill";
 import chalk from "chalk";
+import fs from "fs";
 import minimist from "minimist";
 import path from "path";
 import updateNotifier from "update-notifier";
 import sync from "./sync";
 
-const pkg = require("../package.json");
+let pkg;
+if (fs.existsSync("../package.json")) {
+  pkg = require("../package.json");
+} else {
+  pkg = require("./package.json");
+}
 
 var opts: minimist.Opts = {
   boolean: ["help", "delete", "watch", "version", "verbose", "notify-update"],
-  string: ["depth"],
+  string: ["depth", "exclude"],
   alias: {
     help: "h",
     watch: "w",
     verbose: "v",
-    depth: "d"
+    depth: "d",
+    exclude: "e"
   },
   default: {
     help: false,
@@ -24,7 +31,8 @@ var opts: minimist.Opts = {
     delete: true,
     verbose: false,
     "notify-update": true,
-    depth: Infinity
+    depth: Infinity,
+    exclude: null
   },
   stopEarly: true,
   unknown: (option: string) => {

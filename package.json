@@ -11,7 +11,7 @@
   "author": "Pieter De Witte <pieter@straffekoffie.com>",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node ./dist/index.js",
+    "start": "ts-node ./index.ts",
     "build": "tsc",
     "test": "jest"
   },
