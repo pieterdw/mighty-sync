@@ -2,16 +2,15 @@
 
 import "babel-polyfill";
 import chalk from "chalk";
-import fs from "fs";
 import minimist from "minimist";
 import path from "path";
 import updateNotifier from "update-notifier";
 import sync from "./sync";
 
 let pkg;
-if (fs.existsSync("../package.json")) {
+try {
   pkg = require("../package.json");
-} else {
+} catch {
   pkg = require("./package.json");
 }
 

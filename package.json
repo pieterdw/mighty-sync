@@ -1,6 +1,6 @@
 {
   "name": "mighty-sync",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "Sync files between local folders",
   "main": "dist/index.js",
   "bin": {
