@@ -55,6 +55,8 @@ var helpInfo = {
   version: "Show version and exit",
   verbose: "Moar output",
   "notify-update": "Enable update notification",
+  exclude:
+    "Exclude certain files or folders from sync, you can use glob patterns",
   depth:
     "Maximum depth if you have performance issues (not everywhere yet: only on existing mirrors and watch scenario)"
 };
@@ -118,11 +120,11 @@ function help() {
             ", " +
             (opts.alias[opt] as string[])
               .map(function(a) {
-                return chalk.blue("-" + a) + " " + arg;
+                return chalk.blue("-" + a) + "=" + arg;
               })
               .join(", ");
         } else if (opts.alias[opt]) {
-          key += ", " + chalk.blue("-" + opts.alias[opt]) + " " + arg;
+          key += ", " + chalk.blue("-" + opts.alias[opt]) + "=" + arg;
         }
         return { opt: opt, key: key };
       })
@@ -141,6 +143,13 @@ function help() {
 
 var argv = minimist(process.argv.slice(2), opts);
 
+const source = path.resolve(argv._[0]);
+const target = path.resolve(argv._[1]);
+
+const exclude: string[] = Array.isArray(argv.exclude)
+  ? argv.exclude
+  : [argv.exclude];
+
 if (argv.help) {
   help();
   process.exit(0);
@@ -153,7 +162,11 @@ if (argv.version) {
 
 if (argv._.length !== 2) {
   console.error(
-    chalk.bold.red("Expects exactly two arguments, received " + argv._.length)
+    chalk.bold.red(
+      "Expects exactly two arguments, received " +
+        argv._.length +
+        ". Make sure to place all optional arguments before the source and target."
+    )
   );
   help();
   process.exit(1);
@@ -166,12 +179,13 @@ if (argv["notify-update"]) {
 var root = process.cwd();
 
 sync(
-  path.resolve(argv._[0]),
-  path.resolve(argv._[1]),
+  source,
+  target,
   {
     watch: argv.watch,
     delete: argv.delete,
-    depth: Number(argv.depth)
+    depth: Number(argv.depth),
+    exclude: exclude
   },
   (event, data) => {
     var priority = notifyPriority[event] || "low";

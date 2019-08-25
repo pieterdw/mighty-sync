@@ -32,6 +32,7 @@
     "core-js": "2",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
+    "minimatch": "^3.0.4",
     "minimist": "^1.2.0",
     "update-notifier": "^3.0.1"
   },
@@ -41,6 +42,7 @@
     "@types/fs-extra": "^8.0.0",
     "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.137",
+    "@types/minimatch": "^3.0.3",
     "@types/minimist": "^1.2.0",
     "@types/node": "^12.7.2",
     "@types/update-notifier": "^2.5.0",

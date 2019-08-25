@@ -1,13 +1,29 @@
 import chokidar from "chokidar";
 import fs from "fs-extra";
 import { defaults } from "lodash";
+import minimatch from "minimatch";
 import path from "path";
 
-const sync = (source, target, opts, notify) => {
+interface SyncOptions {
+  watch: boolean;
+  delete: boolean;
+  depth: number;
+  exclude: string[];
+}
+
+type NotifyEvent = (event: string, data: any) => void;
+
+const sync = (
+  source: string,
+  target: string,
+  opts: SyncOptions,
+  notify: NotifyEvent
+) => {
   opts = defaults(opts || {}, {
     watch: false,
     delete: false,
-    depth: Infinity
+    depth: Infinity,
+    exclude: []
   });
 
   if (typeof opts.depth !== "number" || isNaN(opts.depth)) {
@@ -28,8 +44,8 @@ const sync = (source, target, opts, notify) => {
       .watch(source, {
         persistent: true,
         depth: opts.depth,
-        ignoreInitial: true
-        // TODO "ignore": opts.ignore
+        ignoreInitial: true,
+        ignored: opts.exclude
       })
       //.on("raw", console.log.bind(console, "raw"))
       .on("ready", notify.bind(undefined, "watch", source))
@@ -60,7 +76,18 @@ function watcherError(opts, notify) {
   };
 }
 
-function mirror(source, target, opts, notify, depth) {
+function mirror(
+  source: string,
+  target: string,
+  opts: SyncOptions,
+  notify: NotifyEvent,
+  depth: number
+) {
+  if (opts.exclude.some(excl => minimatch(source, excl))) {
+    // exclude path
+    return true;
+  }
+
   // Specifc case where the very source is gone
   var sourceStat;
   try {
