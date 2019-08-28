@@ -1,7 +1,7 @@
 {
   "name": "mighty-sync",
-  "version": "0.0.6",
-  "description": "Sync files between local folders",
+  "version": "0.0.7",
+  "description": "Sync files between folders, with watch and exclude options.",
   "main": "dist/index.js",
   "bin": {
     "mighty-sync": "dist/index.js"
@@ -11,7 +11,7 @@
   "author": "Pieter De Witte <pieter@straffekoffie.com>",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node ./index.ts",
+    "start": "ts-node ./src/index.ts",
     "build": "tsc",
     "test": "jest"
   },
