@@ -3,13 +3,7 @@ import fs from "fs-extra";
 import { defaults } from "lodash";
 import minimatch from "minimatch";
 import path from "path";
-
-interface SyncOptions {
-  watch: boolean;
-  delete: boolean;
-  depth: number;
-  exclude: string[];
-}
+import { SyncOptions } from "./types/SyncOptions";
 
 type NotifyEvent = (event: string, data: any) => void;
 

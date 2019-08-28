@@ -6,16 +6,12 @@ import minimist from "minimist";
 import path from "path";
 import updateNotifier from "update-notifier";
 import sync from "./sync";
+import { HelpInfo } from "./types/HelpInfo";
 
-let pkg;
-try {
-  pkg = require("../package.json");
-} catch {
-  pkg = require("./package.json");
-}
+const pkg = require("../package.json");
 
-var opts: minimist.Opts = {
-  boolean: ["help", "delete", "watch", "version", "verbose", "notify-update"],
+const opts: minimist.Opts = {
+  boolean: ["watch", "no-delete", "verbose", "version", "help"],
   string: ["depth", "exclude"],
   alias: {
     help: "h",
@@ -27,9 +23,8 @@ var opts: minimist.Opts = {
   default: {
     help: false,
     watch: false,
-    delete: true,
+    "no-delete": false,
     verbose: false,
-    "notify-update": true,
     depth: Infinity,
     exclude: null
   },
@@ -47,22 +42,39 @@ var opts: minimist.Opts = {
   }
 };
 
-var helpInfo = {
-  help: "Show help and exit",
-  delete: "Delete extraneous files from target",
-  watch: "Watch changes in source and keep target in sync",
-  version: "Show version and exit",
-  verbose: "Moar output",
-  "notify-update": "Enable update notification",
-  exclude:
-    "Exclude certain files or folders from sync, you can use glob patterns",
-  depth:
-    "Maximum depth if you have performance issues (not everywhere yet: only on existing mirrors and watch scenario)"
-};
-
-var typeInfo = {
-  depth: "number"
-};
+const helpInfos: HelpInfo[] = [
+  {
+    key: "watch",
+    description: "Watch changes in source and keep target in sync"
+  },
+  {
+    key: "exclude",
+    description:
+      "Exclude certain files or folders from sync by using glob patterns",
+    type: "string"
+  },
+  {
+    key: "depth",
+    description: "Maximum depth if you have performance issues",
+    type: "number"
+  },
+  {
+    key: "no-delete",
+    description: "Prevent deleting extraneous files from target"
+  },
+  {
+    key: "verbose",
+    description: "More output"
+  },
+  {
+    key: "version",
+    description: "Show version"
+  },
+  {
+    key: "help",
+    description: "Show help"
+  }
+];
 
 var notifyPriority = {
   error: "high",
@@ -94,60 +106,21 @@ function help() {
     chalk.yellow("target")
   );
   console.log("");
-  var keys = (opts.boolean as string[])
-    .map(function(opt) {
-      var key = chalk.blue("--[no-]" + opt);
-      if (Array.isArray(opts.alias[opt]) && opts.alias[opt].length > 0) {
-        key +=
-          ", " +
-          (opts.alias[opt] as string[])
-            .map(function(a) {
-              return chalk.blue("[--no]-" + a);
-            })
-            .join(", ");
-      } else if (opts.alias[opt]) {
-        key += ", " + chalk.blue("[--no]-" + opts.alias[opt]);
-      }
-      return { opt: opt, key: key };
-    })
-    .concat(
-      (opts.string as string[]).map(function(opt) {
-        var arg = "<" + (typeInfo[opt] || "value") + ">";
-        var key = chalk.blue("--" + opt) + "=" + arg;
-        if (Array.isArray(opts.alias[opt]) && opts.alias[opt].length > 0) {
-          key +=
-            ", " +
-            (opts.alias[opt] as string[])
-              .map(function(a) {
-                return chalk.blue("-" + a) + "=" + arg;
-              })
-              .join(", ");
-        } else if (opts.alias[opt]) {
-          key += ", " + chalk.blue("-" + opts.alias[opt]) + "=" + arg;
-        }
-        return { opt: opt, key: key };
-      })
-    );
-  keys.forEach(function(k) {
-    console.log(k.key);
-    if (helpInfo[k.opt]) {
-      console.log("\t%s", helpInfo[k.opt]);
+  helpInfos.forEach(helpInfo => {
+    let typeInfo = helpInfo.type ? "=<" + helpInfo.type + ">" : "";
+    let key = chalk.blue("--" + helpInfo.key) + typeInfo;
+    const aliases = opts.alias[helpInfo.key];
+    if (aliases) {
+      const aliasArray = Array.isArray(aliases) ? aliases : [aliases];
+      key += aliasArray.map(a => ", " + chalk.blue("-" + a) + typeInfo).join();
     }
-    if (opts.default[k.opt] !== undefined) {
-      console.log("\t" + chalk.dim("Default: " + opts.default[k.opt]));
-    }
+    console.log(key);
+    console.log("\t%s", helpInfo.description);
     console.log("");
   });
 }
 
 var argv = minimist(process.argv.slice(2), opts);
-
-const source = path.resolve(argv._[0]);
-const target = path.resolve(argv._[1]);
-
-const exclude: string[] = Array.isArray(argv.exclude)
-  ? argv.exclude
-  : [argv.exclude];
 
 if (argv.help) {
   help();
@@ -171,11 +144,16 @@ if (argv._.length !== 2) {
   process.exit(1);
 }
 
-if (argv["notify-update"]) {
-  updateNotifier({ pkg: pkg }).notify();
-}
+updateNotifier({ pkg: pkg }).notify();
 
 var root = process.cwd();
+
+const source = path.resolve(argv._[0]);
+const target = path.resolve(argv._[1]);
+
+const exclude: string[] = Array.isArray(argv.exclude)
+  ? argv.exclude
+  : [argv.exclude];
 
 sync(
   source,
