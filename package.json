@@ -1,7 +1,7 @@
 {
   "name": "mighty-sync",
-  "version": "0.0.7",
-  "description": "Sync files between folders, with watch and exclude options.",
+  "version": "0.0.10",
+  "description": "Sync files between folders, with a watch and exclude option.",
   "main": "dist/index.js",
   "bin": {
     "mighty-sync": "dist/index.js"
@@ -10,6 +10,17 @@
   "homepage": "https://gitlab.com/straffekoffie/mighty-sync",
   "author": "Pieter De Witte <pieter@straffekoffie.com>",
   "license": "MIT",
+  "keywords": [
+    "sync",
+    "copy",
+    "cp",
+    "folder",
+    "directory",
+    "file",
+    "synchronize",
+    "move",
+    "watch"
+  ],
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "build": "tsc",
