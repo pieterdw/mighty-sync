@@ -1,6 +1,6 @@
 {
   "name": "mighty-sync",
-  "version": "0.0.10",
+  "version": "0.1.0",
   "description": "Sync files between folders, with a watch and exclude option.",
   "main": "dist/index.js",
   "bin": {
