@@ -26,7 +26,7 @@ const sync = (
   }
 
   // Initial mirror
-  var mirrored = mirror(source, target, opts, notify, 0);
+  var mirrored = mirror(source, source, target, opts, notify, 0);
 
   if (!mirrored) {
     return false;
@@ -53,14 +53,20 @@ const sync = (
 };
 
 function watcherCopy(source, target, opts, notify) {
-  return function(f, stats) {
-    copy(f, path.join(target, path.relative(source, f)), notify);
+  return (f, stats) => {
+    const relative = path.relative(source, f);
+    if (!opts.exclude.some(excl => minimatch(relative, excl))) {
+      copy(f, path.join(target, relative), notify);
+    }
   };
 }
 
 function watcherDestroy(source, target, opts, notify) {
-  return function(f) {
-    deleteExtra(path.join(target, path.relative(source, f)), opts, notify);
+  return f => {
+    const relative = path.relative(source, f);
+    if (!opts.exclude.some(excl => minimatch(relative, excl))) {
+      deleteExtra(path.join(target, relative), opts, notify);
+    }
   };
 }
 
@@ -71,6 +77,7 @@ function watcherError(opts, notify) {
 }
 
 function mirror(
+  root: string,
   source: string,
   target: string,
   opts: SyncOptions,
@@ -80,6 +87,13 @@ function mirror(
   if (opts.exclude.some(excl => minimatch(source, excl))) {
     // exclude path
     return true;
+  }
+  if (root !== source) {
+    const relative = path.relative(root, source);
+    if (opts.exclude.some(excl => minimatch(relative, excl))) {
+      // exclude path
+      return true;
+    }
   }
 
   // Specifc case where the very source is gone
@@ -110,6 +124,7 @@ function mirror(
     // copy from source to target
     var copied = fs.readdirSync(source).every(function(f) {
       return mirror(
+        root,
         path.join(source, f),
         path.join(target, f),
         opts,
@@ -157,7 +172,7 @@ function mirror(
 }
 
 function deleteExtra(fileordir, opts, notify) {
-  if (opts.delete) {
+  if (!opts["no-delete"]) {
     return destroy(fileordir, notify);
   } else {
     notify("no-delete", fileordir);
