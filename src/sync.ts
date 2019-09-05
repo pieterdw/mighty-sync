@@ -26,7 +26,7 @@ const sync = (
   }
 
   // Initial mirror
-  var mirrored = mirror(source, source, target, opts, notify, 0);
+  const mirrored = mirror(source, source, target, opts, notify, 0);
 
   if (!mirrored) {
     return false;
@@ -52,38 +52,38 @@ const sync = (
   }
 };
 
-function watcherCopy(source, target, opts, notify) {
+const watcherCopy = (source, target, opts, notify) => {
   return (f, stats) => {
     const relative = path.relative(source, f);
     if (!opts.exclude.some(excl => minimatch(relative, excl))) {
       copy(f, path.join(target, relative), notify);
     }
   };
-}
+};
 
-function watcherDestroy(source, target, opts, notify) {
+const watcherDestroy = (source, target, opts, notify) => {
   return f => {
     const relative = path.relative(source, f);
     if (!opts.exclude.some(excl => minimatch(relative, excl))) {
       deleteExtra(path.join(target, relative), opts, notify);
     }
   };
-}
+};
 
-function watcherError(opts, notify) {
-  return function(err) {
+const watcherError = (opts, notify) => {
+  return err => {
     notify("error", err);
   };
-}
+};
 
-function mirror(
+const mirror = (
   root: string,
   source: string,
   target: string,
   opts: SyncOptions,
   notify: NotifyEvent,
   depth: number
-) {
+) => {
   if (opts.exclude.some(excl => minimatch(source, excl))) {
     // exclude path
     return true;
@@ -97,7 +97,7 @@ function mirror(
   }
 
   // Specifc case where the very source is gone
-  var sourceStat;
+  let sourceStat;
   try {
     sourceStat = fs.statSync(source);
   } catch (e) {
@@ -107,7 +107,7 @@ function mirror(
     }
   }
 
-  var targetStat;
+  let targetStat;
   try {
     targetStat = fs.statSync(target);
   } catch (e) {
@@ -122,7 +122,7 @@ function mirror(
     }
 
     // copy from source to target
-    var copied = fs.readdirSync(source).every(function(f) {
+    const copied = fs.readdirSync(source).every(f => {
       return mirror(
         root,
         path.join(source, f),
@@ -134,7 +134,7 @@ function mirror(
     });
 
     // check for extraneous
-    var deletedExtra = fs.readdirSync(target).every(function(f) {
+    const deletedExtra = fs.readdirSync(target).every(f => {
       return (
         fs.existsSync(path.join(source, f)) ||
         deleteExtra(path.join(target, f), opts, notify)
@@ -169,18 +169,18 @@ function mirror(
   } else {
     throw new Error("Unexpected case: WTF?");
   }
-}
+};
 
-function deleteExtra(fileordir, opts, notify) {
+const deleteExtra = (fileordir, opts, notify) => {
   if (!opts["no-delete"]) {
     return destroy(fileordir, notify);
   } else {
     notify("no-delete", fileordir);
     return true;
   }
-}
+};
 
-function copy(source, target, notify) {
+const copy = (source, target, notify) => {
   notify("copy", [source, target]);
   try {
     fs.copySync(source, target);
@@ -189,9 +189,9 @@ function copy(source, target, notify) {
     notify("error", e);
     return false;
   }
-}
+};
 
-function destroy(fileordir, notify) {
+const destroy = (fileordir, notify) => {
   notify("remove", fileordir);
   try {
     fs.remove(fileordir);
@@ -200,6 +200,6 @@ function destroy(fileordir, notify) {
     notify("error", e);
     return false;
   }
-}
+};
 
 export default sync;

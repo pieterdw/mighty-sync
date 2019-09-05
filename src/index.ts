@@ -76,7 +76,7 @@ const helpInfos: HelpInfo[] = [
   }
 ];
 
-var notifyPriority = {
+const notifyPriority = {
   error: "high",
   copy: "normal",
   remove: "normal",
@@ -85,7 +85,7 @@ var notifyPriority = {
   "no-delete": "low"
 };
 
-function help() {
+const help = () => {
   console.log("%s %s", chalk.bold(pkg.name), chalk.cyan(pkg.version));
   console.log(pkg.description);
   console.log("");
@@ -118,9 +118,9 @@ function help() {
     console.log("\t%s", helpInfo.description);
     console.log("");
   });
-}
+};
 
-var argv = minimist(process.argv.slice(2), opts);
+const argv = minimist(process.argv.slice(2), opts);
 
 if (argv.help) {
   help();
@@ -146,7 +146,7 @@ if (argv._.length !== 2) {
 
 updateNotifier({ pkg: pkg }).notify();
 
-var root = process.cwd();
+const root = process.cwd();
 
 const source = path.resolve(argv._[0]);
 const target = path.resolve(argv._[1]);
@@ -165,7 +165,7 @@ sync(
     exclude: exclude
   },
   (event, data) => {
-    var priority = notifyPriority[event] || "low";
+    const priority = notifyPriority[event] || "low";
 
     if (!argv.verbose && priority === "low") {
       return;
