@@ -52,26 +52,44 @@ const sync = (
   }
 };
 
-const watcherCopy = (source, target, opts, notify) => {
+const checkExclude = (exclude: string[], path: string) => {
+  return (
+    exclude &&
+    exclude.some(x => !!x) &&
+    exclude.some(excl => minimatch(path, excl))
+  );
+};
+
+const watcherCopy = (
+  source: string,
+  target: string,
+  opts: SyncOptions,
+  notify: NotifyEvent
+) => {
   return (f, stats) => {
     const relative = path.relative(source, f);
-    if (!opts.exclude.some(excl => minimatch(relative, excl))) {
+    if (!checkExclude(opts.exclude, relative)) {
       copy(f, path.join(target, relative), notify);
     }
   };
 };
 
-const watcherDestroy = (source, target, opts, notify) => {
+const watcherDestroy = (
+  source: string,
+  target: string,
+  opts: SyncOptions,
+  notify: NotifyEvent
+) => {
   return f => {
     const relative = path.relative(source, f);
-    if (!opts.exclude.some(excl => minimatch(relative, excl))) {
+    if (!checkExclude(opts.exclude, relative)) {
       deleteExtra(path.join(target, relative), opts, notify);
     }
   };
 };
 
-const watcherError = (opts, notify) => {
-  return err => {
+const watcherError = (opts: SyncOptions, notify: NotifyEvent) => {
+  return (err: any) => {
     notify("error", err);
   };
 };
@@ -84,13 +102,13 @@ const mirror = (
   notify: NotifyEvent,
   depth: number
 ) => {
-  if (opts.exclude.some(excl => minimatch(source, excl))) {
+  if (checkExclude(opts.exclude, source)) {
     // exclude path
     return true;
   }
   if (root !== source) {
     const relative = path.relative(root, source);
-    if (opts.exclude.some(excl => minimatch(relative, excl))) {
+    if (checkExclude(opts.exclude, relative)) {
       // exclude path
       return true;
     }
@@ -171,16 +189,16 @@ const mirror = (
   }
 };
 
-const deleteExtra = (fileordir, opts, notify) => {
-  if (!opts["no-delete"]) {
+const deleteExtra = (fileordir, opts: SyncOptions, notify: NotifyEvent) => {
+  if (opts.delete) {
     return destroy(fileordir, notify);
   } else {
-    notify("no-delete", fileordir);
+    notify("nodelete", fileordir);
     return true;
   }
 };
 
-const copy = (source, target, notify) => {
+const copy = (source: string, target: string, notify: NotifyEvent) => {
   notify("copy", [source, target]);
   try {
     fs.copySync(source, target);
@@ -191,7 +209,7 @@ const copy = (source, target, notify) => {
   }
 };
 
-const destroy = (fileordir, notify) => {
+const destroy = (fileordir: string, notify: NotifyEvent) => {
   notify("remove", fileordir);
   try {
     fs.remove(fileordir);
