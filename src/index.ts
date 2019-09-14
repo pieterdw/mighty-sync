@@ -11,7 +11,7 @@ import { HelpInfo } from "./types/HelpInfo";
 const pkg = require("../package.json");
 
 const opts: minimist.Opts = {
-  boolean: ["watch", "no-delete", "verbose", "version", "help"],
+  boolean: ["watch", "nodelete", "verbose", "version", "help"],
   string: ["depth", "exclude"],
   alias: {
     help: "h",
@@ -23,7 +23,7 @@ const opts: minimist.Opts = {
   default: {
     help: false,
     watch: false,
-    "no-delete": false,
+    nodelete: false,
     verbose: false,
     depth: Infinity,
     exclude: null
@@ -59,7 +59,7 @@ const helpInfos: HelpInfo[] = [
     type: "number"
   },
   {
-    key: "no-delete",
+    key: "nodelete",
     description: "Prevent deleting extraneous files from target"
   },
   {
@@ -82,7 +82,7 @@ const notifyPriority = {
   remove: "normal",
   watch: "normal",
   "max-depth": "low",
-  "no-delete": "low"
+  nodelete: "low"
 };
 
 const help = () => {
@@ -160,7 +160,7 @@ sync(
   target,
   {
     watch: argv.watch,
-    delete: argv.delete,
+    delete: !argv.nodelete,
     depth: Number(argv.depth),
     exclude: exclude
   },
@@ -210,7 +210,7 @@ sync(
         );
         break;
 
-      case "no-delete":
+      case "nodelete":
         console.log(
           "%s: %s extraneous but not deleted (use %s)",
           chalk.bold.dim("IGNORED"),

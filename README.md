@@ -30,7 +30,7 @@ mighty-sync [options] <source> <target>
 --depth=<number>, -d=<number>
         Maximum depth if you have performance issues
 
---no-delete
+--nodelete
         Prevent deleting extraneous files from target
 
 --verbose, -v
